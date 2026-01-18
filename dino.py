@@ -52,20 +52,51 @@ def cactus():
     cactus_turtle.goto(cactusx, cactusy + 15)
     cactus_turtle.showturtle()
 
+import turtle as t
+
+# Add these at the top with your other global variables
+onground = 1
+frame = 0
+jumping_up = False
+jumping_down = False
+
 def jump1(x, y):
-    global onground
+    global onground, jumping_up, frame
     if onground == 1:
         onground = 0
-        global dinoy
-        dinoy += 40
-        t.ontimer(jump2, 1000)
-    
+        jumping_up = True
+        jumping_down = False
+        frame = 0
+        jump1anim()  # Start immediately
 
-def jump2():
-    global onground
-    global dinoy
-    dinoy -= 40
-    onground = 1
+def jump1anim():
+    global dinoy, frame, jumping_up, jumping_down
+    if jumping_up and frame < 30:
+        dinoy += 1
+        frame += 1
+        t.ontimer(jump1anim, 10)
+    elif frame >= 30 and jumping_up:
+        jumping_up = False
+        t.ontimer(start_fall, 1000)  # Wait 1 second
+
+def start_fall():
+    global jumping_down, frame
+    jumping_down = True
+    frame = 0
+    jump2anim()
+
+def jump2anim():
+    global dinoy, frame, jumping_down, onground
+    if jumping_down and frame < 30:
+        dinoy -= 1
+        frame += 1
+        t.ontimer(jump2anim, 10)
+    elif frame >= 30 and jumping_down:
+        jumping_down = False
+        onground = 1
+        dinoy = 0  # Ensure exact position
+
+t.onscreenclick(jump1)
 
 t.onscreenclick(jump1)
 t.listen()
